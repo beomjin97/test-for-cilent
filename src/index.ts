@@ -1,5 +1,8 @@
 import express, { Application } from 'express';
 import cors from 'cors';
+import { DataBase1, DataBase2, detailPost } from './data';
+import session from 'express-session';
+import cookieParser from 'cookie-parser';
 
 const app: Application = express();
 
@@ -10,7 +13,8 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
-
+app.use(session({ secret: 'my secret', resave: false, saveUninitialized: false }));
+app.use(cookieParser());
 const PORT = 5000;
 
 app.get('/main', (req, res) => {
@@ -22,10 +26,24 @@ app.get('/main', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  // 로그인 데이터 인증 로직;
-  res.send('ok');
+  const { userId, password } = req.body;
+  //@ts-ignore
+  req.session.isLoggedIn = true;
+  req.session.save(() => {
+    res.json({
+      statusText: 'OK',
+      data: userId,
+    });
+  });
+});
+
+app.get('/post/:postId', (req, res) => {
+  const id = req.params.postId;
+  res.send(JSON.stringify(DataBase1[parseInt(id[1]) - 1]));
 });
 
 app.listen(PORT, () => {
   console.log(`The Express server is listening at port : ${PORT}`);
 });
+
+// title만 출력

@@ -13,6 +13,10 @@ async function main() {
 
   const users = client.db('uou').collection('users');
 
+  await users.deleteMany({});
+
+  await users.insertOne({});
+
   await client.close();
 }
 
